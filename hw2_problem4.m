@@ -17,7 +17,12 @@ channel = [[-63.5:1:63.5]];
 for jj = 1:max(size(data)) %jj=row
     
 depth = jj*pixel_size_through_depth; %m
-data_matrix = data([1:jj+150],:,:);
+if jj+150 <= max(size(data))
+    data_matrix = data([1:jj+150],:,:);
+elseif jj+150 > max(size(data))
+    data_matrix = data;
+end
+[rows_data_matrix col_data_matrix z_data_matrix] = size(data_matrix);
 
 for ii = 1:(length(channel))
     xe(ii) = 0.1953e-3*abs(channel(ii)); 
@@ -28,12 +33,12 @@ time_from_zero = time_to_point(64);
 time_from_zero_v = ones(1,length(time_to_point))*time_from_zero;
 time_delay = time_to_point - time_from_zero_v;
 
-time_array = time_array_all(1:max(size(data_matrix)));
+time_array = time_array_all(1:rows_data_matrix);
 
 for aa = 1:128
     delay = time_delay(aa);
     time_array_delayed = time_array+delay;
-    delayed_channel([1:jj+150],aa,:) = interp1(time_array,data_matrix([1:jj+150],aa,:),time_array_delayed,'linear');
+    delayed_channel(1:rows_data_matrix,aa,:) = interp1(time_array,data_matrix(1:rows_data_matrix,aa,:),time_array_delayed,'linear');
     delayed_channel_row(jj,aa,:) = delayed_channel(jj,aa,:);
 end
 
@@ -75,7 +80,12 @@ channel = [-63.5:1:63.5];
 for jj = 1:max(size(data)) %jj=row
     
 depth = jj*pixel_size_through_depth; %m
-data_matrix = data([1:jj+150],:,:);
+if jj+150 <= max(size(data))
+    data_matrix = data([1:jj+150],:,:);
+elseif jj+150 > max(size(data))
+    data_matrix = data;
+end
+[rows_data_matrix col_data_matrix z_data_matrix] = size(data_matrix);
 
 for ii = 1:(length(channel))
     xe(ii) = 0.1953e-3*abs(channel(ii)); 
@@ -91,9 +101,10 @@ time_array = time_array_all(1:max(size(data_matrix)));
 for aa = 1:128
     delay = time_delay(aa);
     time_array_delayed = time_array+delay;
-    delayed_channel([1:jj+150],aa,:) = interp1(time_array,data_matrix([1:jj+150],aa,:),time_array_delayed,'linear');
+    delayed_channel(1:rows_data_matrix,aa,:) = interp1(time_array,data_matrix(1:rows_data_matrix,aa,:),time_array_delayed,'linear');
     delayed_channel_row(jj,aa,:) = delayed_channel(jj,aa,:);
 end
+
 
 end
 
