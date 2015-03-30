@@ -3,7 +3,7 @@ clc;
 
 load('pointTargetData.mat');
 
-data = veraStrct.data;
+data = veraStrct.data(80:end,:,:);
 fs = 20e6;
 speed = 1540; %m/s in body
 pixel_size_through_depth = 0.5*(speed/fs); 
@@ -68,7 +68,7 @@ title('Compressed B-mode image (pointTargetData.mat), Problem 4');
 
 load('anecoicCystData.mat');
 
-data = veraStrct.data;
+data = veraStrct.data(80:end,:,:);
 fs = 20e6;
 speed = 1540; %m/s in body
 pixel_size_through_depth = 0.5*(speed/fs); 

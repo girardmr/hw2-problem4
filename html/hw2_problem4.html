@@ -1,0 +1,338 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>hw2_problem4</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-03-23"><meta name="DC.source" content="hw2_problem4.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput">clear <span class="string">all</span>;
+clc;
+
+load(<span class="string">'pointTargetData.mat'</span>);
+
+data = veraStrct.data;
+fs = 20e6;
+speed = 1540; <span class="comment">%m/s in body</span>
+pixel_size_through_depth = 0.5*(speed/fs);
+
+<span class="keyword">for</span> ii = 1:max(size(data))
+    time_array_all(ii) = ii/fs;
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> cc = 1:128
+<span class="keyword">for</span> bb = 1:128
+    time_array(:,bb,cc) = time_array_all;
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+channel = [[-63.5:1:63.5]];
+
+<span class="keyword">for</span> beam = 1:128
+
+<span class="keyword">for</span> jj = 1:max(size(data)) <span class="comment">%jj=row</span>
+
+depth = jj*pixel_size_through_depth; <span class="comment">%m</span>
+
+data_matrix = data;
+[rows_data_matrix col_data_matrix z_data_matrix] = size(data_matrix);
+
+<span class="keyword">for</span> ii = 1:(length(channel))
+    xe(ii) = 0.1953e-3*abs(channel(ii));
+    d(ii) = (xe(ii)^2+depth^2)^0.5 + depth;
+    time_to_point(ii) = d(ii)/speed;
+<span class="keyword">end</span>
+
+delay_matrix(jj,:,beam) = time_to_point; <span class="comment">%delays</span>
+
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> aa = 1:128
+    delayed_channel(1:rows_data_matrix,aa,beam) = interp1(time_array(1:rows_data_matrix,aa,beam),data_matrix(1:rows_data_matrix,aa,beam),delay_matrix(1:rows_data_matrix,aa,beam),<span class="string">'linear'</span>);
+<span class="keyword">end</span>
+
+
+<span class="keyword">end</span>
+
+
+<span class="keyword">for</span> ll = 1:numel(delayed_channel)
+    <span class="keyword">if</span> isnan(delayed_channel(ll))==1
+        delayed_channel(ll) = 0;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+figure;
+min_data = min(min(min(delayed_channel)));
+max_data = max(max(max(delayed_channel)));
+imagesc(delayed_channel(:,:),[min_data, max_data])
+colormap(<span class="string">'gray'</span>);
+title(<span class="string">'Channel data with delays (pointTargetData.mat), Problem 4'</span>);
+
+summed_channels = sum(delayed_channel,2);
+figure;
+imagesc(20*log10(abs(hilbert(summed_channels(:,:)))));
+colormap(<span class="string">'gray'</span>);
+title(<span class="string">'Compressed B-mode image (pointTargetData.mat), Problem 4'</span>);
+
+load(<span class="string">'anecoicCystData.mat'</span>);
+
+data = veraStrct.data;
+fs = 20e6;
+speed = 1540; <span class="comment">%m/s in body</span>
+pixel_size_through_depth = 0.5*(speed/fs);
+
+<span class="keyword">for</span> ii = 1:max(size(data))
+    time_array_all(ii) = ii/fs;
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> cc = 1:128
+<span class="keyword">for</span> bb = 1:128
+    time_array(:,bb,cc) = time_array_all;
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+channel = [[-63.5:1:63.5]];
+
+<span class="keyword">for</span> beam = 1:128
+
+<span class="keyword">for</span> jj = 1:max(size(data)) <span class="comment">%jj=row</span>
+
+depth = jj*pixel_size_through_depth; <span class="comment">%m</span>
+
+data_matrix = data;
+[rows_data_matrix col_data_matrix z_data_matrix] = size(data_matrix);
+
+<span class="keyword">for</span> ii = 1:(length(channel))
+    xe(ii) = 0.1953e-3*abs(channel(ii));
+    d(ii) = (xe(ii)^2+depth^2)^0.5 + depth;
+    time_to_point(ii) = d(ii)/speed;
+<span class="keyword">end</span>
+
+delay_matrix(jj,:,beam) = time_to_point; <span class="comment">%delays</span>
+
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> aa = 1:128
+    delayed_channel(1:rows_data_matrix,aa,beam) = interp1(time_array(1:rows_data_matrix,aa,beam),data_matrix(1:rows_data_matrix,aa,beam),delay_matrix(1:rows_data_matrix,aa,beam),<span class="string">'linear'</span>);
+<span class="keyword">end</span>
+
+
+<span class="keyword">end</span>
+
+
+<span class="keyword">for</span> ll = 1:numel(delayed_channel)
+    <span class="keyword">if</span> isnan(delayed_channel(ll))==1
+        delayed_channel(ll) = 0;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+figure;
+min_data = min(min(min(delayed_channel)));
+max_data = max(max(max(delayed_channel)));
+imagesc(delayed_channel(:,:),[min_data, max_data])
+colormap(<span class="string">'gray'</span>);
+title(<span class="string">'Channel data with delays (anecoicCystData.mat), Problem 4'</span>);
+
+summed_channels = sum(delayed_channel,2);
+figure;
+imagesc(20*log10(abs(hilbert(summed_channels(:,:)))));
+colormap(<span class="string">'gray'</span>);
+title(<span class="string">'Compressed B-mode image (anecoicCystData.mat), Problem 4'</span>);
+</pre><img vspace="5" hspace="5" src="hw2_problem4_01.png" alt=""> <img vspace="5" hspace="5" src="hw2_problem4_02.png" alt=""> <img vspace="5" hspace="5" src="hw2_problem4_03.png" alt=""> <img vspace="5" hspace="5" src="hw2_problem4_04.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+clear all;
+clc;
+
+load('pointTargetData.mat');
+
+data = veraStrct.data;
+fs = 20e6;
+speed = 1540; %m/s in body
+pixel_size_through_depth = 0.5*(speed/fs); 
+
+for ii = 1:max(size(data))
+    time_array_all(ii) = ii/fs;
+end
+
+for cc = 1:128
+for bb = 1:128
+    time_array(:,bb,cc) = time_array_all;
+end
+end
+
+channel = [[-63.5:1:63.5]];
+
+for beam = 1:128
+    
+for jj = 1:max(size(data)) %jj=row
+    
+depth = jj*pixel_size_through_depth; %m
+
+data_matrix = data;
+[rows_data_matrix col_data_matrix z_data_matrix] = size(data_matrix);
+
+for ii = 1:(length(channel))
+    xe(ii) = 0.1953e-3*abs(channel(ii)); 
+    d(ii) = (xe(ii)^2+depth^2)^0.5 + depth;
+    time_to_point(ii) = d(ii)/speed;
+end
+
+delay_matrix(jj,:,beam) = time_to_point; %delays
+
+end
+
+for aa = 1:128
+    delayed_channel(1:rows_data_matrix,aa,beam) = interp1(time_array(1:rows_data_matrix,aa,beam),data_matrix(1:rows_data_matrix,aa,beam),delay_matrix(1:rows_data_matrix,aa,beam),'linear');
+end
+
+
+end
+
+
+for ll = 1:numel(delayed_channel)
+    if isnan(delayed_channel(ll))==1
+        delayed_channel(ll) = 0;
+    end
+end
+
+figure;
+min_data = min(min(min(delayed_channel)));
+max_data = max(max(max(delayed_channel)));
+imagesc(delayed_channel(:,:),[min_data, max_data])
+colormap('gray');
+title('Channel data with delays (pointTargetData.mat), Problem 4');
+
+summed_channels = sum(delayed_channel,2);
+figure;
+imagesc(20*log10(abs(hilbert(summed_channels(:,:)))));
+colormap('gray');
+title('Compressed B-mode image (pointTargetData.mat), Problem 4');
+
+load('anecoicCystData.mat');
+
+data = veraStrct.data;
+fs = 20e6;
+speed = 1540; %m/s in body
+pixel_size_through_depth = 0.5*(speed/fs); 
+
+for ii = 1:max(size(data))
+    time_array_all(ii) = ii/fs;
+end
+
+for cc = 1:128
+for bb = 1:128
+    time_array(:,bb,cc) = time_array_all;
+end
+end
+
+channel = [[-63.5:1:63.5]];
+
+for beam = 1:128
+    
+for jj = 1:max(size(data)) %jj=row
+    
+depth = jj*pixel_size_through_depth; %m
+
+data_matrix = data;
+[rows_data_matrix col_data_matrix z_data_matrix] = size(data_matrix);
+
+for ii = 1:(length(channel))
+    xe(ii) = 0.1953e-3*abs(channel(ii)); 
+    d(ii) = (xe(ii)^2+depth^2)^0.5 + depth;
+    time_to_point(ii) = d(ii)/speed;
+end
+
+delay_matrix(jj,:,beam) = time_to_point; %delays
+
+end
+
+for aa = 1:128
+    delayed_channel(1:rows_data_matrix,aa,beam) = interp1(time_array(1:rows_data_matrix,aa,beam),data_matrix(1:rows_data_matrix,aa,beam),delay_matrix(1:rows_data_matrix,aa,beam),'linear');
+end
+
+
+end
+
+
+for ll = 1:numel(delayed_channel)
+    if isnan(delayed_channel(ll))==1
+        delayed_channel(ll) = 0;
+    end
+end
+
+figure;
+min_data = min(min(min(delayed_channel)));
+max_data = max(max(max(delayed_channel)));
+imagesc(delayed_channel(:,:),[min_data, max_data])
+colormap('gray');
+title('Channel data with delays (anecoicCystData.mat), Problem 4');
+
+summed_channels = sum(delayed_channel,2);
+figure;
+imagesc(20*log10(abs(hilbert(summed_channels(:,:)))));
+colormap('gray');
+title('Compressed B-mode image (anecoicCystData.mat), Problem 4');
+
+
+##### SOURCE END #####
+--></body></html>
